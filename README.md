@@ -1,4 +1,9 @@
 Tribool
 =======
 
-Parses and executes tribool expressions.
+Parses and executes triboolean expressions. Just compile the program using ghc and run it with a format such as:
+
+./tribool "a -> b"
+./tribool "(a | b) & c"
+
+and it will generate truth tables for the expressions.
