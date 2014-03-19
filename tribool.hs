@@ -5,8 +5,6 @@ import Text.Parsec
 import System.Environment (getArgs)
 import Data.List (nub, transpose)
 import Data.Monoid
-import Control.Monad (foldM)
-import Control.Arrow (second)
 
 {- Defines TriBools (True, False, Bottom). -}
 data TriBool = T | F | B deriving (Show, Read, Eq)
