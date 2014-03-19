@@ -116,12 +116,12 @@ getVariables expr = reverse . nub $ getVariables' expr
 -- Maps operators to types.
 table =
     [
-        [Prefix $ (char '¬' >> return NOT) <|> (char '~' >> return NOT)],
-        [Infix ((char '|' >> return OR) <|> (string "||" >> return OR)) AssocLeft],
-        [Infix (char '+' >> return XOR) AssocLeft],
-        [Infix ((char '^' >> return AND) <|> (char '&' >> return AND)) AssocLeft],
-        [Infix ((string "<->" >> return IIF) <|> (string "<=>" >> return IIF)) AssocLeft],
-        [Infix ((string "->" >> return THEN) <|> (string "=>" >> return THEN)) AssocLeft]
+    [Prefix $ (char '¬' >> return NOT) <|> (char '~' >> return NOT)],
+    [Infix ((char '|' >> return OR) <|> (string "||" >> return OR)) AssocLeft],
+    [Infix (char '+' >> return XOR) AssocLeft],
+    [Infix ((char '^' >> return AND) <|> (char '&' >> return AND)) AssocLeft],
+    [Infix ((string "<->" >> return IIF) <|> (string "<=>" >> return IIF)) AssocLeft],
+    [Infix ((string "->" >> return THEN) <|> (string "=>" >> return THEN)) AssocLeft]
     ]
 
 -- Thanks to https://stackoverflow.com/questions/7209260/checking-if-a-string-consists-of-balanced-parenthesis
@@ -142,10 +142,9 @@ tribooleanExpression :: Parsec String () (Expr TriBool)
 tribooleanExpression = buildExpressionParser table formula <?> "expression"
 
 printTruthStatement :: Expr TriBool -> [VarMap] -> IO ()
-printTruthStatement expression mapping = do
-    let x = foldr (\(_, value) str -> str ++ show value ++ "\t") "" mapping
-    putStrLn $ x ++ show (exec mapping expression)
+printTruthStatement expression mapping = putStrLn $ x ++ show (exec mapping expression)
     where
+        x = foldr (\(_, value) str -> str ++ show value ++ "\t") "" mapping
 
 outputTruthTable :: String -> IO ()
 outputTruthTable input =
