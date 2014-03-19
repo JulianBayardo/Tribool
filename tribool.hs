@@ -1,9 +1,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleInstances #-}
-import Text.Parsec.Expr
-import Text.Parsec
-import System.Environment (getArgs)
-import Data.List (nub, transpose)
+module TriBool where
+
+import Data.List (transpose, nub)
 import Data.Monoid
 
 {- Defines TriBools (True, False, Bottom). -}
@@ -55,10 +54,10 @@ truthTable = transpose . gTruth
                 two = fmap (repeatN 3) prevTable
 
                 expand :: Int -> [a] -> [a]
-                expand n = foldr ((++) . replicate n) []
+                expand k = foldr ((++) . replicate k) []
 
                 repeatN :: Int -> [a] -> [a]
-                repeatN 0 list = []
+                repeatN 0 _ = []
                 repeatN x list = list ++ repeatN (x-1) list
 
 {-
@@ -112,53 +111,3 @@ getVariables expr = reverse . nub $ getVariables' expr
         getVariables' (THEN x y) = getVariables' x ++ getVariables' y
         getVariables' (IIF x y) = getVariables' x ++ getVariables' y
         getVariables' (XOR x y) = getVariables' x ++ getVariables' y
-
--- Maps operators to types.
-table =
-    [
-    [Prefix $ (char '¬' >> return NOT) <|> (char '~' >> return NOT)],
-    [Infix ((char '|' >> return OR) <|> (string "||" >> return OR)) AssocLeft],
-    [Infix (char '+' >> return XOR) AssocLeft],
-    [Infix ((char '^' >> return AND) <|> (char '&' >> return AND)) AssocLeft],
-    [Infix ((string "<->" >> return IIF) <|> (string "<=>" >> return IIF)) AssocLeft],
-    [Infix ((string "->" >> return THEN) <|> (string "=>" >> return THEN)) AssocLeft]
-    ]
-
--- Thanks to https://stackoverflow.com/questions/7209260/checking-if-a-string-consists-of-balanced-parenthesis
-braces x = choice [between (char o) (char c) x | (o,c) <- [('(',')'),('[',']'),('{','}')]]
-
-{-| Defines what a formula is:
-    * Must begin and end with (, {, [ and ], }, ) respectively.
-    * May contain some sort of expression.
-    * May have an alphanumeric value, in which case is supposed to be a variable name.
-    * There can be any numer of spaces between any of the mentioned tokens.
--}
-formula = braces (do { spaces; x <- tribooleanExpression; spaces; return x })
-        <|> do {spaces; x <- many1 alphaNum; spaces; return (VARIABLE x) }
-        <?> "atomic expression"
-
--- Builds a expression parser.
-tribooleanExpression :: Parsec String () (Expr TriBool)
-tribooleanExpression = buildExpressionParser table formula <?> "expression"
-
-printTruthStatement :: Expr TriBool -> [VarMap] -> IO ()
-printTruthStatement expression mapping = putStrLn $ x ++ show (exec mapping expression)
-    where
-        x = foldr (\(_, value) str -> str ++ show value ++ "\t") "" mapping
-
-outputTruthTable :: String -> IO ()
-outputTruthTable input =
-    case parse tribooleanExpression "" input of
-        Left error -> print error
-        Right expression ->
-            let
-                variables = getVariables expression
-                table = truthTable $ length variables
-                varMap = fmap (zip variables) table
-            in
-            putStrLn (foldr (\name str -> str ++ name ++ "\t") "" variables) >>
-            mapM_ (printTruthStatement expression) varMap
-
-
-main :: IO ()
-main = getArgs >>= mapM_ outputTruthTable
