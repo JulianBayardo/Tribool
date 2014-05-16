@@ -2,7 +2,7 @@ module Parser where
 
 import Text.Parsec.Expr
 import Text.Parsec
-import TriBool
+import ThreeValued
 
 -- Maps operators to types.
 table =
@@ -29,5 +29,5 @@ formula = braces (do { spaces; x <- tribooleanExpression; spaces; return x })
         <?> "atomic expression"
 
 -- Builds a expression parser.
-tribooleanExpression :: Parsec String () (Expr TriBool)
-tribooleanExpression = buildExpressionParser table formula <?> "expression"
+threeValuedExpression :: Parsec String () (Expr ThreeValued)
+ThreeValuedExpression = buildExpressionParser table formula <?> "expression"
