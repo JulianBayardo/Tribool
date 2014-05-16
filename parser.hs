@@ -24,10 +24,10 @@ braces x = choice [between (char o) (char c) x | (o,c) <- [('(',')'),('[',']'),(
     * May have an alphanumeric value, in which case is supposed to be a variable name.
     * There can be any numer of spaces between any of the mentioned tokens.
 -}
-formula = braces (do { spaces; x <- tribooleanExpression; spaces; return x })
+formula = braces (do { spaces; x <- threeValuedExpression; spaces; return x })
         <|> do {spaces; x <- many1 alphaNum; spaces; return (VARIABLE x) }
         <?> "atomic expression"
 
 -- Builds a expression parser.
 threeValuedExpression :: Parsec String () (Expr ThreeValued)
-ThreeValuedExpression = buildExpressionParser table formula <?> "expression"
+threeValuedExpression = buildExpressionParser table formula <?> "expression"
