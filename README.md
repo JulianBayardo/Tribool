@@ -13,5 +13,7 @@ And run it with the expression(s) you want to evaluate as an argument, for examp
     ./threevalued "(a|b)&c" "a|b"
     ...
 
-And it will generate truth tables for the expressions. The recognized operators
+It will then generate truth tables for the expressions. The recognized operators
 are: -> => (then), <-> <=> (iif), + (xor), | || (or), & ^ (and), ~ ¬ (not).
+
+Please notice that spaces between expressions are currently not parsed properly, they will be fixed soon.
